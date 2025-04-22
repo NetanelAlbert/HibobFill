@@ -2,6 +2,48 @@
 const TIMEZONE_OFFSET = -180; // Keep this for status display only
 const HIBOB_URL = 'app.hibob.com';
 
+// Default settings
+const DEFAULT_SETTINGS = {
+    startTime: '09:00',
+    endTime: '18:00',
+    startOffset: 0,
+    endOffset: 0,
+    minHours: 0,
+    startNegativeOffset: true,
+    endNegativeOffset: true
+};
+
+// Helper function to save settings
+async function saveSettings() {
+    const settings = {
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+        startOffset: parseInt(document.getElementById('startOffset').value),
+        endOffset: parseInt(document.getElementById('endOffset').value),
+        minHours: parseFloat(document.getElementById('minHours').value),
+        startNegativeOffset: document.getElementById('startNegativeOffset').checked,
+        endNegativeOffset: document.getElementById('endNegativeOffset').checked
+    };
+    await chrome.storage.sync.set({ settings });
+    return settings;
+}
+
+// Helper function to load settings
+async function loadSettings() {
+    const result = await chrome.storage.sync.get('settings');
+    const settings = result.settings || DEFAULT_SETTINGS;
+    
+    document.getElementById('startTime').value = settings.startTime;
+    document.getElementById('endTime').value = settings.endTime;
+    document.getElementById('startOffset').value = settings.startOffset;
+    document.getElementById('endOffset').value = settings.endOffset;
+    document.getElementById('minHours').value = settings.minHours;
+    document.getElementById('startNegativeOffset').checked = settings.startNegativeOffset;
+    document.getElementById('endNegativeOffset').checked = settings.endNegativeOffset;
+    
+    return settings;
+}
+
 // Helper function to check if current tab is HiBob
 async function isHiBobTab() {
     try {
@@ -56,9 +98,11 @@ function createDayItem(date) {
     fillButton.onclick = async () => {
         fillButton.disabled = true;
         try {
+            const settings = await saveSettings();
             const response = await sendMessageToContentScript({
                 action: 'fillSingleDay',
-                date: date
+                date: date,
+                settings: settings
             });
             
             if (response.success) {
@@ -84,6 +128,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loadingElement = document.getElementById('loading');
     const mainContent = document.getElementById('mainContent');
     const wrongSiteMessage = document.getElementById('wrongSiteMessage');
+    const toggleAdvancedButton = document.getElementById('toggleAdvanced');
+    const advancedPanel = document.getElementById('advancedPanel');
+
+    // Load saved settings
+    await loadSettings();
+
+    // Toggle advanced settings panel
+    toggleAdvancedButton.addEventListener('click', () => {
+        const isHidden = advancedPanel.style.display === 'none';
+        advancedPanel.style.display = isHidden ? 'flex' : 'none';
+        toggleAdvancedButton.textContent = isHidden ? 'Hide Advanced Settings' : 'Show Advanced Settings';
+    });
+
+    // Save settings when they change
+    const settingInputs = ['startTime', 'endTime', 'startOffset', 'endOffset', 'minHours'];
+    settingInputs.forEach(id => {
+        document.getElementById(id).addEventListener('change', saveSettings);
+    });
+
+    // Save settings when checkboxes change
+    const settingCheckboxes = ['startNegativeOffset', 'endNegativeOffset'];
+    settingCheckboxes.forEach(id => {
+        document.getElementById(id).addEventListener('change', saveSettings);
+    });
 
     const isOnHiBob = await isHiBobTab();
     
@@ -98,7 +166,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     fillAllButton.addEventListener('click', async () => {
         fillAllButton.disabled = true;
         try {
-            const response = await sendMessageToContentScript({ action: 'fillAllDays' });
+            const settings = await saveSettings();
+            const response = await sendMessageToContentScript({ 
+                action: 'fillAllDays',
+                settings: settings
+            });
             if (response.success) {
                 missingDaysContainer.innerHTML = '';
                 showStatus('Successfully filled all missing days');

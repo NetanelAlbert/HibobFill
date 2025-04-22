@@ -102,6 +102,56 @@
       flex-direction: column;
       gap: 16px;
     }
+    .advanced-settings {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toggle-button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #6c757d;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .toggle-button:hover {
+      background-color: #5a6268;
+    }
+    .advanced-panel {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .setting-item label {
+      font-weight: 500;
+    }
+    .setting-item input {
+      padding: 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+    }
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .checkbox-wrapper input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+    .checkbox-wrapper label {
+      font-weight: normal;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -112,6 +162,39 @@
     </div>
     <div id="mainContent" class="container">
       <button id="fillAll">Fill All Missing Days</button>
+      <div class="advanced-settings">
+        <button id="toggleAdvanced" class="toggle-button">Show Advanced Settings</button>
+        <div id="advancedPanel" class="advanced-panel" style="display: none;">
+          <div class="setting-item">
+            <label for="startTime">Start Time:</label>
+            <input type="time" id="startTime" value="09:00">
+          </div>
+          <div class="setting-item">
+            <label for="endTime">End Time:</label>
+            <input type="time" id="endTime" value="18:00">
+          </div>
+          <div class="setting-item">
+            <label for="startOffset">Start Random Offset (minutes):</label>
+            <input type="number" id="startOffset" value="0" min="0">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="startNegativeOffset" checked>
+              <label for="startNegativeOffset">Allow negative offset</label>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label for="endOffset">End Random Offset (minutes):</label>
+            <input type="number" id="endOffset" value="0" min="0">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="endNegativeOffset" checked>
+              <label for="endNegativeOffset">Allow negative offset</label>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label for="minHours">Min Working Hours:</label>
+            <input type="number" id="minHours" value="0" min="0" step="0.5">
+          </div>
+        </div>
+      </div>
       <div class="missing-days" id="missingDays">
         <div class="loading" id="loading">Loading missing days...</div>
       </div>
