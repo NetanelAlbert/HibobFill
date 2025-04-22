@@ -1,5 +1,17 @@
 // Configuration - no longer needed as it's moved to content.js
 const TIMEZONE_OFFSET = -180; // Keep this for status display only
+const HIBOB_URL = 'app.hibob.com';
+
+// Helper function to check if current tab is HiBob
+async function isHiBobTab() {
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        return tab && tab.url && tab.url.includes(HIBOB_URL);
+    } catch (error) {
+        console.error('[HiBob Extension Popup] Error checking tab:', error);
+        return false;
+    }
+}
 
 // Helper function to show status message
 function showStatus(message, isError = false) {
@@ -66,10 +78,21 @@ function createDayItem(date) {
     return dayItem;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const missingDaysContainer = document.getElementById('missingDays');
     const fillAllButton = document.getElementById('fillAll');
     const loadingElement = document.getElementById('loading');
+    const mainContent = document.getElementById('mainContent');
+    const wrongSiteMessage = document.getElementById('wrongSiteMessage');
+
+    const isOnHiBob = await isHiBobTab();
+    
+    mainContent.style.display = isOnHiBob ? 'flex' : 'none';
+    wrongSiteMessage.style.display = isOnHiBob ? 'none' : 'block';
+    
+    if (!isOnHiBob) {
+        return;
+    }
 
     // Fill all missing days
     fillAllButton.addEventListener('click', async () => {

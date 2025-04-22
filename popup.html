@@ -81,16 +81,42 @@
       font-style: italic;
       color: #666;
     }
+    .wrong-site {
+      text-align: center;
+      padding: 16px;
+      display: none;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      margin-top: 16px;
+    }
+    .wrong-site a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .wrong-site a:hover {
+      text-decoration: underline;
+    }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="content-wrapper">
     <div class="header">HiBob Attendance Filler</div>
-    <button id="fillAll">Fill All Missing Days</button>
-    <div class="missing-days" id="missingDays">
-      <div class="loading" id="loading">Loading missing days...</div>
+    <div id="wrongSiteMessage" class="wrong-site">
+      Please navigate to <a href="https://app.hibob.com" target="_blank">HiBob</a> to use this extension.
     </div>
-    <div class="status" id="status"></div>
+    <div id="mainContent" class="container">
+      <button id="fillAll">Fill All Missing Days</button>
+      <div class="missing-days" id="missingDays">
+        <div class="loading" id="loading">Loading missing days...</div>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>
