@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const wrongSiteMessage = document.getElementById('wrongSiteMessage');
     const toggleAdvancedButton = document.getElementById('toggleAdvanced');
     const advancedPanel = document.getElementById('advancedPanel');
+    const toggleDaysButton = document.getElementById('toggleDays');
 
     // Load saved settings
     await loadSettings();
@@ -139,6 +140,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isHidden = advancedPanel.style.display === 'none';
         advancedPanel.style.display = isHidden ? 'flex' : 'none';
         toggleAdvancedButton.textContent = isHidden ? 'Hide Advanced Settings' : 'Show Advanced Settings';
+    });
+
+    // Toggle missing days panel
+    toggleDaysButton.addEventListener('click', () => {
+        const isHidden = missingDaysContainer.style.display === 'none';
+        missingDaysContainer.style.display = isHidden ? 'flex' : 'none';
+        toggleDaysButton.textContent = isHidden ? 'Hide Days' : 'Show Days';
     });
 
     // Save settings when they change
