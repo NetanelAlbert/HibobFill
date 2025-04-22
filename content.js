@@ -2,13 +2,40 @@ console.log('[HiBob Extension] Content script starting to load...');
 
 try {
     // Configuration
-    const EMPLOYEE_ID = '2483023679005393405';
     const WORK_START_TIME = '09:00';
     const WORK_END_TIME = '18:00';
-    const TIMEZONE_OFFSET = -180;
     const DEFAULT_TIMESHEET_ID = 0;
 
-    console.log('[HiBob Extension] Content script initialized with configuration');
+    let USER_DATA = null;
+
+    // Function to fetch user data
+    async function fetchUserData() {
+        const response = await fetch("https://app.hibob.com/api/user", {
+            headers: {
+                "accept": "application/json, text/plain, */*",
+                "accept-language": "en",
+                "bob-timezoneoffset": "-180",
+                "content-type": "application/json;charset=UTF-8",
+                "x-requested-with": "XMLHttpRequest"
+            },
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user data');
+        }
+
+        return await response.json();
+    }
+
+    // Initialize the extension
+    async function initialize() {
+        console.log('[HiBob Extension] Fetching user data...');
+        USER_DATA = await fetchUserData();
+        console.log('[HiBob Extension] User data fetched successfully');
+        console.log('[HiBob Extension] Content script initialized with configuration');
+    }
 
     // Helper function to check if a date needs attendance filling
     function needsAttendanceFilling(entry) {
@@ -37,23 +64,27 @@ try {
 
     // Function to fill attendance for a specific date
     async function fillAttendance(date) {
+        if (!USER_DATA) throw new Error('User data not initialized');
+
         const formattedDate = formatDateForApi(date);
+        const timezoneOffset = USER_DATA.timezone === "Asia/Jerusalem" ? -180 : -new Date().getTimezoneOffset();
+        
         const body = [{
             id: null,
             start: `${formattedDate}T${WORK_START_TIME}`,
             end: `${formattedDate}T${WORK_END_TIME}`,
             entryType: 'work',
-            offset: TIMEZONE_OFFSET
+            offset: timezoneOffset
         }];
 
         const response = await fetch(
-            `https://app.hibob.com/api/attendance/employees/${EMPLOYEE_ID}/attendance/entries?forDate=${formattedDate}`,
+            `https://app.hibob.com/api/attendance/employees/${USER_DATA.id}/attendance/entries?forDate=${formattedDate}`,
             {
                 method: 'POST',
                 headers: {
                     'accept': 'application/json, text/plain, */*',
                     'accept-language': 'en',
-                    'bob-timezoneoffset': TIMEZONE_OFFSET.toString(),
+                    'bob-timezoneoffset': timezoneOffset.toString(),
                     'content-type': 'application/json;charset=UTF-8',
                     'x-requested-with': 'XMLHttpRequest'
                 },
@@ -71,11 +102,15 @@ try {
 
     // Function to get all missing days
     async function getMissingDays() {
+        if (!USER_DATA) throw new Error('User data not initialized');
+        
+        const timezoneOffset = USER_DATA.timezone === "Asia/Jerusalem" ? -180 : -new Date().getTimezoneOffset();
+
         const response = await fetch("https://app.hibob.com/api/company/views/search?idsOnly=false", {
             method: 'POST',
             headers: {
                 'accept': 'application/json, text/plain, */*',
-                'bob-timezoneoffset': TIMEZONE_OFFSET.toString(),
+                'bob-timezoneoffset': timezoneOffset.toString(),
                 'content-type': 'application/json;charset=UTF-8',
                 'x-requested-with': 'XMLHttpRequest'
             },
@@ -85,7 +120,7 @@ try {
                     operator: "text_equals",
                     fieldPath: "/internal/status"
                 }],
-                employeeId: EMPLOYEE_ID,
+                employeeId: USER_DATA.id,
                 timesheetId: DEFAULT_TIMESHEET_ID,
                 type: "time_attendance_employee_timesheet",
                 fields: [
@@ -118,6 +153,10 @@ try {
 
         (async () => {
             try {
+                if (!USER_DATA) {
+                    await initialize();
+                }
+
                 switch (request.action) {
                     case 'getMissingDays':
                         console.log('[HiBob Extension] Processing getMissingDays request');
@@ -152,6 +191,11 @@ try {
             }
         })();
         return true; // Required to use sendResponse asynchronously
+    });
+
+    // Initialize the extension when the script loads
+    initialize().catch(error => {
+        console.error('[HiBob Extension] Error during initialization:', error);
     });
 
     console.log('[HiBob Extension] Content script successfully loaded and initialized');
