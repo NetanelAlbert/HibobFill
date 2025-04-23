@@ -152,6 +152,21 @@
       font-weight: normal;
       font-size: 14px;
     }
+    .timesheet-selector {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+    .timesheet-selector label {
+      font-weight: 500;
+    }
+    .timesheet-selector select {
+      padding: 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -161,6 +176,10 @@
       Please navigate to <a href="https://app.hibob.com" target="_blank">HiBob</a> to use this extension.
     </div>
     <div id="mainContent" class="container">
+      <div id="timesheetContainer" class="timesheet-selector">
+        <label for="timesheetSelect">Select Timesheet:</label>
+        <select id="timesheetSelect"></select>
+      </div>
       <button id="fillAll">Fill All Missing Days</button>
       <div class="advanced-settings">
         <button id="toggleAdvanced" class="toggle-button">Show Advanced Settings</button>

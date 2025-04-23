@@ -1,12 +1,8 @@
 console.log('[HiBob Extension] Content script starting to load...');
 
 try {
-    // Configuration
-    const WORK_START_TIME = '09:00';
-    const WORK_END_TIME = '18:00';
-    const DEFAULT_TIMESHEET_ID = 0;
-
     let USER_DATA = null;
+    let AVAILABLE_TIMESHEETS = null;
 
     // Function to fetch user data
     async function fetchUserData() {
@@ -29,11 +25,45 @@ try {
         return await response.json();
     }
 
+    // Added: Function to fetch available timesheets
+    async function fetchTimesheets() {
+        if (!USER_DATA) throw new Error('User data not initialized for timesheet fetch');
+
+        const response = await fetch(`https://app.hibob.com/api/attendance/employees/${USER_DATA.id}/timesheets`, {
+            headers: {
+                "accept": "application/json, text/plain, */*",
+                "accept-language": "en",
+                "bob-timezoneoffset": "-180",
+                "content-type": "application/json;charset=UTF-8",
+                "x-requested-with": "XMLHttpRequest"
+            },
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch timesheets');
+        }
+
+        const data = await response.json();
+        // Filter for unlocked timesheets and keep only necessary fields
+        return data.employeeTimesheets
+            .filter(sheet => sheet.timesheetState && !sheet.timesheetState.locked)
+            .map(sheet => ({
+                id: sheet.id,
+                cycleStartDate: sheet.cycleStartDate,
+                cycleEndDate: sheet.cycleEndDate
+            }));
+    }
+
     // Initialize the extension
     async function initialize() {
         console.log('[HiBob Extension] Fetching user data...');
         USER_DATA = await fetchUserData();
         console.log('[HiBob Extension] User data fetched successfully');
+        console.log('[HiBob Extension] Fetching available timesheets...');
+        AVAILABLE_TIMESHEETS = await fetchTimesheets();
+        console.log('[HiBob Extension] Available timesheets fetched:', AVAILABLE_TIMESHEETS);
         console.log('[HiBob Extension] Content script initialized with configuration');
     }
 
@@ -150,10 +180,11 @@ try {
         return true;
     }
 
-    // Function to get all missing days
-    async function getMissingDays() {
+    // Function to get all missing days for a specific timesheet
+    async function getMissingDays(timesheetId) {
         if (!USER_DATA) throw new Error('User data not initialized');
-        
+        if (timesheetId === null || timesheetId === undefined) throw new Error('Timesheet ID is required');
+
         const timezoneOffset = USER_DATA.timezone === "Asia/Jerusalem" ? -180 : -new Date().getTimezoneOffset();
 
         const response = await fetch("https://app.hibob.com/api/company/views/search?idsOnly=false", {
@@ -171,7 +202,7 @@ try {
                     fieldPath: "/internal/status"
                 }],
                 employeeId: USER_DATA.id,
-                timesheetId: DEFAULT_TIMESHEET_ID,
+                timesheetId: timesheetId,
                 type: "time_attendance_employee_timesheet",
                 fields: [
                     "/time_attendance_employee_timesheet/alerts",
@@ -203,36 +234,56 @@ try {
 
         (async () => {
             try {
-                if (!USER_DATA) {
+                // Ensure initialization is complete before handling messages
+                if (!USER_DATA || AVAILABLE_TIMESHEETS === null) {
+                    console.log('[HiBob Extension] Initializing on demand...');
                     await initialize();
+                    console.log('[HiBob Extension] On-demand initialization complete.');
                 }
 
                 switch (request.action) {
+                    case 'getTimesheets':
+                        console.log('[HiBob Extension] Processing getTimesheets request');
+                        sendResponse({ timesheets: AVAILABLE_TIMESHEETS });
+                        break;
+
                     case 'getMissingDays':
-                        console.log('[HiBob Extension] Processing getMissingDays request');
-                        const missingDays = await getMissingDays();
+                        if (request.timesheetId === null || request.timesheetId === undefined) {
+                             throw new Error('Timesheet ID missing in getMissingDays request');
+                        }
+                        console.log(`[HiBob Extension] Processing getMissingDays request for timesheet: ${request.timesheetId}`);
+                        const missingDays = await getMissingDays(request.timesheetId);
                         console.log('[HiBob Extension] Found missing days:', missingDays);
                         sendResponse({ missingDays });
                         break;
 
                     case 'fillSingleDay':
-                        console.log('[HiBob Extension] Processing fillSingleDay request for date:', request.date);
+                        console.log(`[HiBob Extension] Processing fillSingleDay request for date: ${request.date}`);
                         await fillAttendance(request.date, request.settings);
                         console.log('[HiBob Extension] Successfully filled attendance for date:', request.date);
                         sendResponse({ success: true });
                         break;
 
                     case 'fillAllDays':
-                        console.log('[HiBob Extension] Processing fillAllDays request');
-                        const days = await getMissingDays();
+                        if (request.timesheetId === null || request.timesheetId === undefined) {
+                             throw new Error('Timesheet ID missing in fillAllDays request');
+                        }
+                        console.log(`[HiBob Extension] Processing fillAllDays request for timesheet: ${request.timesheetId}`);
+                        const days = await getMissingDays(request.timesheetId);
                         console.log('[HiBob Extension] Found days to fill:', days);
                         for (const date of days) {
                             console.log('[HiBob Extension] Filling attendance for date:', date);
                             await fillAttendance(date, request.settings);
-                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            await new Promise(resolve => setTimeout(resolve, 500));
                         }
                         console.log('[HiBob Extension] Successfully filled all days');
-                        sendResponse({ success: true });
+                        const remainingDays = await getMissingDays(request.timesheetId);
+                        sendResponse({ success: true, remainingDays: remainingDays });
+                        break;
+
+                    default:
+                        console.warn('[HiBob Extension] Unknown action received:', request.action);
+                        sendResponse({ error: `Unknown action: ${request.action}` });
                         break;
                 }
             } catch (error) {
@@ -240,15 +291,10 @@ try {
                 sendResponse({ error: error.message });
             }
         })();
-        return true; // Required to use sendResponse asynchronously
+        return true;
     });
 
-    // Initialize the extension when the script loads
-    initialize().catch(error => {
-        console.error('[HiBob Extension] Error during initialization:', error);
-    });
-
-    console.log('[HiBob Extension] Content script successfully loaded and initialized');
+    console.log('[HiBob Extension] Content script loaded and listener set up.');
 } catch (error) {
     console.error('[HiBob Extension] Error initializing content script:', error);
 }
