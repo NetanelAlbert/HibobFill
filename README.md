@@ -4,6 +4,8 @@
 
 This Chrome extension helps you automatically fill missing attendance in HiBob with ease.
 
+> **Disclaimer:** This is a third-party tool and is not affiliated with, endorsed by, or connected to HiBob in any way. This is an unofficial extension created by independent developers.
+
 ## Features
 
 - **View Missing Days**: Quickly see all days with missing attendance.
@@ -37,6 +39,7 @@ This Chrome extension helps you automatically fill missing attendance in HiBob w
   - Non-working days
   - Days with approved time off (vacation, sick days, etc.)
   - Days that already have attendance entries
+- **Not an Official HiBob Product**: This extension is developed independently and is not associated with or supported by HiBob.
 
 ## Development
 
