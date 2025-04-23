@@ -218,6 +218,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Added: Get timesheet elements
     const timesheetContainerElement = document.getElementById('timesheetContainer');
     const timesheetSelectElement = document.getElementById('timesheetSelect');
+    
+    // Remove the dynamic privacy policy link code since it's already in the HTML
+    // Keep only the disclaimer notice
+    const disclaimerElement = document.getElementById('disclaimer') || document.createElement('div');
+    if (!document.getElementById('disclaimer')) {
+        disclaimerElement.id = 'disclaimer';
+        disclaimerElement.innerHTML = '<p style="font-size:11px;color:#666;text-align:center;margin-top:10px;">This is an unofficial tool. Not affiliated with or endorsed by HiBob.</p>';
+        document.body.appendChild(disclaimerElement);
+    }
 
     // Load saved settings
     await loadSettings();

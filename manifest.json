@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "HiBob Attendance Filler",
+  "name": "Attendance Helper for HiBob",
   "version": "1.0.0",
-  "description": "Automatically fill missing attendance in HiBob",
+  "description": "Unofficial tool to manage your attendance entries in HiBob. Not affiliated with or endorsed by HiBob.",
   "permissions": [
     "activeTab",
     "scripting",
@@ -26,5 +26,6 @@
   }],
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "homepage_url": "https://github.com/NetanelAlbert/HibobFill"
 } 
