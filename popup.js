@@ -199,12 +199,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const toggleAdvancedButton = document.getElementById('toggleAdvanced');
     const advancedPanel = document.getElementById('advancedPanel');
     const toggleDaysButton = document.getElementById('toggleDays');
+    const aboutButton = document.getElementById('aboutButton');
+    const aboutInfo = document.getElementById('aboutInfo');
+    const versionElement = document.getElementById('version');
     // Added: Get timesheet elements
     const timesheetContainerElement = document.getElementById('timesheetContainer');
     const timesheetSelectElement = document.getElementById('timesheetSelect');
 
     // Load saved settings
     await loadSettings();
+
+    // Load version from manifest
+    const manifestData = chrome.runtime.getManifest();
+    versionElement.textContent = manifestData.version;
 
     // Toggle advanced settings panel
     toggleAdvancedButton.addEventListener('click', () => {
@@ -218,6 +225,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isHidden = missingDaysContainer.style.display === 'none';
         missingDaysContainer.style.display = isHidden ? 'flex' : 'none';
         toggleDaysButton.textContent = isHidden ? 'Hide Days' : 'Show Days';
+    });
+
+    // Toggle about info panel
+    aboutButton.addEventListener('click', () => {
+        const isHidden = aboutInfo.style.display === 'none';
+        aboutInfo.style.display = isHidden ? 'block' : 'none';
+        aboutButton.textContent = isHidden ? 'Hide About' : 'About';
     });
 
     // Save settings when they change
