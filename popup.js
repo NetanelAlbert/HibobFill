@@ -190,6 +190,19 @@ async function loadUserInfo() {
     }
 }
 
+// Add this function to update the progress bar
+function updateProgressBar(percentage) {
+    const progressBar = document.getElementById('progressBar');
+    progressBar.style.width = `${percentage}%`;
+}
+
+// Listen for progress updates from content script
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'updateProgress') {
+        updateProgressBar(message.percentage);
+    }
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
     const missingDaysContainer = document.getElementById('missingDays');
     const fillAllButton = document.getElementById('fillAll');
@@ -400,6 +413,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         fillAllButton.disabled = true;
         const originalButtonText = fillAllButton.textContent;
         fillAllButton.textContent = 'Filling...';
+        
+        // Show progress container
+        const progressContainer = document.getElementById('progressContainer');
+        progressContainer.style.display = 'block';
+        updateProgressBar(0); // Reset progress bar
 
         try {
             const settings = await saveSettings();
@@ -413,7 +431,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (response.success) {
                 // Reload missing days to confirm they are gone
                 await loadMissingDays();
-                 // Check if loadMissingDays already showed the "No missing days" message
+                // Check if loadMissingDays already showed the "No missing days" message
                 if (missingDaysContainer.textContent.includes("No missing days found")) {
                     showStatus('Successfully filled all missing days');
                 } else {
@@ -429,6 +447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } finally {
             fillAllButton.disabled = !missingDaysContainer.querySelector('.day-item'); // Re-enable only if days remain
             fillAllButton.textContent = originalButtonText;
+            progressContainer.style.display = 'none'; // Hide progress bar after completion
         }
     });
 

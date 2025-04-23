@@ -282,10 +282,17 @@ try {
                         console.log(`[HiBob Extension] Processing fillAllDays request for timesheet: ${request.timesheetId}`);
                         const days = await getMissingDays(request.timesheetId);
                         console.log('[HiBob Extension] Found days to fill:', days);
-                        for (const date of days) {
+                        for (let i = 0; i < days.length; i++) {
+                            const date = days[i];
                             console.log('[HiBob Extension] Filling attendance for date:', date);
                             await fillAttendance(date, request.settings);
                             await new Promise(resolve => setTimeout(resolve, 500));
+
+                            // Send progress update
+                            chrome.runtime.sendMessage({
+                                action: 'updateProgress',
+                                percentage: Math.round(((i + 1) / days.length) * 100)
+                            });
                         }
                         console.log('[HiBob Extension] Successfully filled all days');
                         const remainingDays = await getMissingDays(request.timesheetId);
