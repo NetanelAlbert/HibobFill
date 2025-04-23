@@ -3,39 +3,101 @@
 <head>
   <title>HiBob Attendance Filler</title>
   <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --success: #2ec4b6;
+      --success-dark: #21a99c;
+      --danger: #e63946;
+      --gray-100: #f8f9fa;
+      --gray-200: #e9ecef;
+      --gray-300: #dee2e6;
+      --gray-400: #ced4da;
+      --gray-500: #adb5bd;
+      --gray-600: #6c757d;
+      --gray-700: #495057;
+      --gray-800: #343a40;
+      --gray-900: #212529;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --transition: all 0.2s ease-in-out;
+    }
+    
     body {
       width: 400px;
-      padding: 16px;
+      padding: 20px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      color: var(--gray-800);
+      background-color: #fff;
+      margin: 0;
+      line-height: 1.5;
     }
+    
     .container {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
+    
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--gray-200);
     }
+    
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+    
     .user-profile {
       display: flex;
       align-items: center;
       gap: 12px;
     }
+    
     .user-avatar {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       object-fit: cover;
+      box-shadow: var(--shadow-sm);
+      border: 2px solid white;
     }
+    
     .user-name {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 500;
+      color: var(--gray-700);
     }
+    
+    .card {
+      background-color: white;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-200);
+      transition: var(--transition);
+    }
+    
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--gray-800);
+    }
+    
     .missing-days {
       display: flex;
       flex-direction: column;
@@ -43,159 +105,282 @@
       max-height: 300px;
       overflow-y: auto;
     }
+    
     .day-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background-color: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      transition: var(--transition);
     }
+    
+    .day-item:hover {
+      background-color: white;
+      box-shadow: var(--shadow-sm);
+    }
+    
     .day-date {
       font-weight: 500;
+      color: var(--gray-700);
     }
+    
     button {
-      padding: 8px 16px;
+      padding: 10px 16px;
       border: none;
-      border-radius: 4px;
-      background-color: #007bff;
+      border-radius: var(--radius-sm);
+      background-color: var(--primary);
       color: white;
       cursor: pointer;
       font-size: 14px;
+      font-weight: 500;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
     }
+    
     button:hover {
-      background-color: #0056b3;
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
     }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
     button:disabled {
-      background-color: #cccccc;
+      background-color: var(--gray-400);
       cursor: not-allowed;
+      transform: none;
     }
+    
     .fill-single {
-      background-color: #28a745;
+      background-color: var(--success);
+      padding: 8px 12px;
+      font-size: 13px;
     }
+    
     .fill-single:hover {
-      background-color: #218838;
+      background-color: var(--success-dark);
     }
+    
     .status {
       margin-top: 8px;
-      padding: 8px;
-      border-radius: 4px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
       display: none;
+      animation: fadeIn 0.3s ease-in-out;
     }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
     .status.success {
       display: block;
-      background-color: #d4edda;
-      color: #155724;
+      background-color: rgba(46, 196, 182, 0.1);
+      color: var(--success-dark);
+      border: 1px solid rgba(46, 196, 182, 0.2);
     }
+    
     .status.error {
       display: block;
-      background-color: #f8d7da;
-      color: #721c24;
+      background-color: rgba(230, 57, 70, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(230, 57, 70, 0.2);
     }
+    
     .loading {
       display: none;
       text-align: center;
-      padding: 8px;
+      padding: 12px;
       font-style: italic;
-      color: #666;
+      color: var(--gray-600);
     }
+    
     .wrong-site {
       text-align: center;
-      padding: 16px;
+      padding: 24px;
       display: none;
-      background-color: #f8f9fa;
-      border-radius: 4px;
+      background-color: var(--gray-100);
+      border-radius: var(--radius-md);
       margin-top: 16px;
+      border: 1px solid var(--gray-200);
     }
+    
     .wrong-site a {
-      color: #007bff;
+      color: var(--primary);
       text-decoration: none;
       font-weight: 500;
+      transition: var(--transition);
     }
+    
     .wrong-site a:hover {
       text-decoration: underline;
+      color: var(--primary-dark);
     }
+    
     .content-wrapper {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
+    
+    .toggle-button {
+      background-color: var(--gray-600);
+      padding: 8px 16px;
+      font-size: 13px;
+    }
+    
+    .toggle-button:hover {
+      background-color: var(--gray-700);
+    }
+    
     .advanced-settings {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
     }
-    .toggle-button {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      background-color: #6c757d;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .toggle-button:hover {
-      background-color: #5a6268;
-    }
+    
     .advanced-panel {
       display: none;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
+      background-color: var(--gray-100);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-200);
+      margin-top: 4px;
     }
+    
     .setting-item {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
+    
     .setting-item label {
       font-weight: 500;
+      font-size: 14px;
+      color: var(--gray-700);
     }
+    
     .setting-item input {
-      padding: 8px;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
+      padding: 10px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      transition: var(--transition);
     }
+    
+    .setting-item input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+    }
+    
     .checkbox-wrapper {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 4px;
+      margin-top: 2px;
     }
+    
     .checkbox-wrapper input[type="checkbox"] {
       width: 16px;
       height: 16px;
       margin: 0;
+      accent-color: var(--primary);
     }
+    
     .checkbox-wrapper label {
       font-weight: normal;
-      font-size: 14px;
+      font-size: 13px;
+      color: var(--gray-600);
     }
+    
     .timesheet-selector {
       display: none;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
       margin-bottom: 16px;
     }
+    
     .timesheet-selector label {
       font-weight: 500;
-    }
-    .timesheet-selector select {
-      padding: 8px;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
       font-size: 14px;
+      color: var(--gray-700);
     }
+    
+    .timesheet-selector select {
+      padding: 10px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      background-color: white;
+      transition: var(--transition);
+    }
+    
+    .timesheet-selector select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+    }
+    
     .about-info {
       padding: 16px;
-      border-radius: 4px;
-      background-color: #f8f9fa;
+      border-radius: var(--radius-md);
+      background-color: var(--gray-100);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--gray-700);
+      border: 1px solid var(--gray-200);
+    }
+    
+    .about-info a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .about-info a:hover {
+      text-decoration: underline;
+      color: var(--primary-dark);
+    }
+    
+    #progressContainer {
+      height: 10px;
+      background-color: var(--gray-200);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    
+    #progressBar {
+      height: 100%;
+      background-color: var(--primary);
+      transition: width 0.3s ease;
+      border-radius: 5px;
+    }
+    
+    #fillAll {
+      background-color: var(--primary);
+      font-weight: 600;
+      padding: 12px 16px;
     }
   </style>
 </head>
 <body>
   <div class="content-wrapper">
     <div class="header">
-      <span>HiBob Attendance Filler</span>
+      <span class="header-title">HiBob Attendance Filler</span>
       <div id="userProfile" class="user-profile" style="display: none;">
         <div id="userName" class="user-name"></div>
         <img id="userAvatar" class="user-avatar" src="" alt="User Avatar">
@@ -205,12 +390,12 @@
       Please navigate to <a href="https://app.hibob.com" target="_blank">HiBob</a> to use this extension.
     </div>
     <div id="mainContent" class="container">
-      <div id="timesheetContainer" class="timesheet-selector">
+      <div id="timesheetContainer" class="timesheet-selector card">
         <label for="timesheetSelect">Select Timesheet:</label>
         <select id="timesheetSelect"></select>
       </div>
-      <button id="fillAll">Fill All Missing Days</button>
-      <div class="advanced-settings">
+      <button id="fillAll" class="primary-button">Fill All Missing Days</button>
+      <div class="advanced-settings card">
         <button id="toggleAdvanced" class="toggle-button">Show Advanced Settings</button>
         <div id="advancedPanel" class="advanced-panel" style="display: none;">
           <div class="setting-item">
@@ -248,7 +433,6 @@
         <div class="loading" id="loading">Loading missing days...</div>
       </div>
       <div class="status" id="status"></div>
-      <!-- Added: Progress bar for filling all days -->
       <div id="progressContainer" style="display: none;">
         <div id="progressBar" style="width: 0%; height: 20px; background-color: #007bff;"></div>
       </div>

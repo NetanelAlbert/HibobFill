@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const missingDays = response.missingDays;
             if (!missingDays || missingDays.length === 0) {
-                missingDaysContainer.innerHTML = '<div style="text-align: center; padding: 8px;">No missing days found for this timesheet</div>';
+                missingDaysContainer.innerHTML = '<div style="text-align: center; padding: 8px; color: var(--success-dark);">No missing days found for this timesheet</div>';
                 fillAllButton.disabled = true;
                 toggleDaysButton.style.display = 'none'; // Hide toggle button if no missing days
                 return;
