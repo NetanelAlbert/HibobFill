@@ -160,6 +160,36 @@ function formatTimesheetOption(sheet) {
     return `${monthName} ${year} (${start} - ${end})`;
 }
 
+// Add this function to fetch user info
+async function loadUserInfo() {
+    try {
+        const response = await sendMessageToContentScript({ action: 'getUserInfo' });
+        if (response.error) {
+            throw new Error(response.error);
+        }
+        
+        if (response.user) {
+            const userProfileElement = document.getElementById('userProfile');
+            const userNameElement = document.getElementById('userName');
+            const userAvatarElement = document.getElementById('userAvatar');
+            
+            userNameElement.textContent = response.user.displayName || 'HiBob User';
+            
+            if (response.user.avatar) {
+                userAvatarElement.src = response.user.avatar;
+                userAvatarElement.style.display = 'block';
+            } else {
+                userAvatarElement.style.display = 'none';
+            }
+            
+            userProfileElement.style.display = 'flex';
+        }
+    } catch (error) {
+        console.error('[HiBob Extension Popup] Error loading user info:', error);
+        // Don't show an error to the user - just continue without the profile section
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const missingDaysContainer = document.getElementById('missingDays');
     const fillAllButton = document.getElementById('fillAll');
@@ -211,6 +241,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadingElement.style.display = 'none'; // Hide loading if not on HiBob
         return;
     }
+
+    // Add this: Load user info before timesheets
+    await loadUserInfo();
 
     // --- Timesheet Loading and Selection ---
     async function loadTimesheets() {

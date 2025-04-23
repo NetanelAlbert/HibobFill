@@ -14,9 +14,27 @@
       gap: 16px;
     }
     .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       font-size: 18px;
       font-weight: 600;
       margin-bottom: 8px;
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .user-name {
+      font-size: 16px;
+      font-weight: 500;
     }
     .missing-days {
       display: flex;
@@ -171,7 +189,13 @@
 </head>
 <body>
   <div class="content-wrapper">
-    <div class="header">HiBob Attendance Filler</div>
+    <div class="header">
+      <span>HiBob Attendance Filler</span>
+      <div id="userProfile" class="user-profile" style="display: none;">
+        <div id="userName" class="user-name"></div>
+        <img id="userAvatar" class="user-avatar" src="" alt="User Avatar">
+      </div>
+    </div>
     <div id="wrongSiteMessage" class="wrong-site">
       Please navigate to <a href="https://app.hibob.com" target="_blank">HiBob</a> to use this extension.
     </div>

@@ -242,6 +242,17 @@ try {
                 }
 
                 switch (request.action) {
+                    case 'getUserInfo':
+                        console.log('[HiBob Extension] Processing getUserInfo request');
+                        // Return user display name and avatar
+                        sendResponse({ 
+                            user: {
+                                displayName: USER_DATA.displayName,
+                                avatar: USER_DATA.avatar
+                            } 
+                        });
+                        break;
+
                     case 'getTimesheets':
                         console.log('[HiBob Extension] Processing getTimesheets request');
                         sendResponse({ timesheets: AVAILABLE_TIMESHEETS });
