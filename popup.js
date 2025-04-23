@@ -337,6 +337,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             missingDaysContainer.innerHTML = '<div style="text-align: center; color: orange; padding: 8px;">Select a timesheet first.</div>';
             loadingElement.style.display = 'none';
             fillAllButton.disabled = true;
+            toggleDaysButton.style.display = 'none'; // Hide toggle button if no timesheet is selected
             return;
         }
 
@@ -366,23 +367,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!missingDays || missingDays.length === 0) {
                 missingDaysContainer.innerHTML = '<div style="text-align: center; padding: 8px;">No missing days found for this timesheet</div>';
                 fillAllButton.disabled = true;
+                toggleDaysButton.style.display = 'none'; // Hide toggle button if no missing days
                 return;
             }
-
 
             missingDaysContainer.innerHTML = ''; // Clear loading message before adding days
             missingDays.forEach(date => {
                 missingDaysContainer.appendChild(createDayItem(date));
             });
             fillAllButton.disabled = false; // Enable fill all if days were found
+            toggleDaysButton.style.display = 'block'; // Show the toggle button if there are missing days
             if(toggleDaysButton.textContent === 'Show Days') {
-                missingDaysContainer.style.display = 'none  ';
+                missingDaysContainer.style.display = 'none';
             }
         } catch (error) {
             loadingElement.style.display = 'none';
             missingDaysContainer.innerHTML = `<div style="text-align: center; color: red; padding: 8px;">Failed to load missing days: ${error.message}</div>`;
             console.error('[HiBob Extension Popup] Error in loadMissingDays:', error);
             fillAllButton.disabled = true;
+            toggleDaysButton.style.display = 'none'; // Hide toggle button on error
         }
     }
 
