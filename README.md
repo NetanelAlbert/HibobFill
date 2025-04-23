@@ -1,35 +1,37 @@
 # HiBob Attendance Filler Chrome Extension
 
-This Chrome extension helps you automatically fill missing attendance in HiBob.
+![HiBob Attendance Filler](images/screenshot.png)
+
+This Chrome extension helps you automatically fill missing attendance in HiBob with ease.
 
 ## Features
 
-- View all missing attendance days
-- Fill individual days with one click
-- Fill all missing days at once
-- Automatically sets work hours from 9:00 to 18:00
-- Skips holidays, weekends, and approved time off
+- **View Missing Days**: Quickly see all days with missing attendance.
+- **Fill Individual Days**: Fill attendance for specific days with a single click.
+- **Fill All Days**: Automatically fill all missing days at once.
+- **Customizable Work Hours**: Set your preferred start and end times.
+- **Smart Skipping**: Automatically skips holidays, weekends, and approved time off.
 
 ## Installation
 
-1. Download or clone this repository
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable "Developer mode" in the top right
-4. Click "Load unpacked" and select the extension directory
+1. **Download or Clone**: Get this repository on your local machine.
+2. **Open Chrome Extensions**: Go to `chrome://extensions/` in your Chrome browser.
+3. **Enable Developer Mode**: Toggle the switch in the top right corner.
+4. **Load Unpacked**: Click "Load unpacked" and select the directory where you downloaded the extension.
 
 ## Usage
 
-1. Log in to HiBob (https://app.hibob.com)
-2. Click the extension icon in your Chrome toolbar
-3. You'll see a list of all days with missing attendance
-4. Choose to either:
-   - Click "Fill" next to individual days to fill them one by one
-   - Click "Fill All Missing Days" to fill all missing days at once
+1. **Log In to HiBob**: Visit [HiBob](https://app.hibob.com) and log in.
+2. **Open the Extension**: Click the HiBob Attendance Filler icon in your Chrome toolbar.
+3. **Select Timesheet**: Choose the timesheet you want to fill.
+4. **Fill Attendance**:
+   - Click "Fill" next to individual days to fill them one by one.
+   - Click "Fill All Missing Days" to fill all missing days at once.
 
-## Note
+## Notes
 
-- The extension will fill attendance with fixed hours: 9:00 - 18:00
-- It automatically skips:
+- **Default Hours**: The extension fills attendance with default hours from 9:00 to 18:00.
+- **Automatic Skipping**: It skips:
   - Weekends
   - Holidays
   - Non-working days
@@ -44,11 +46,8 @@ The extension consists of:
 - `popup.js` - Popup logic
 - `content.js` - Content script for interacting with HiBob
 - `background.js` - Background script
-- `images/` - Extension icons (you need to add these)
 
 ## Icons
 
-Before using the extension, you need to add icon files in the following sizes:
-- `images/icon16.png` (16x16)
-- `images/icon48.png` (48x48)
-- `images/icon128.png` (128x128) 
+
+Enjoy seamless attendance management with HiBob Attendance Filler!
