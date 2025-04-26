@@ -160,7 +160,14 @@ function formatTimesheetOption(sheet) {
     return `${monthName} ${year} (${start} - ${end})`;
 }
 
-// Add this function to fetch user info
+// Add this helper function to show the login prompt
+function showLoginPrompt() {
+    const loginPromptElement = document.getElementById('loginPrompt');
+    loginPromptElement.style.display = 'block';
+    mainContent.style.display = 'none';
+}
+
+// Update the loadUserInfo function to use the new helper function
 async function loadUserInfo() {
     try {
         const response = await sendMessageToContentScript({ action: 'getUserInfo' });
@@ -183,10 +190,12 @@ async function loadUserInfo() {
             }
             
             userProfileElement.style.display = 'flex';
+        } else {
+            showLoginPrompt();
         }
     } catch (error) {
         console.error('[HiBob Extension Popup] Error loading user info:', error);
-        // Don't show an error to the user - just continue without the profile section
+        showLoginPrompt();
     }
 }
 

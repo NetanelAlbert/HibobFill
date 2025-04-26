@@ -19,10 +19,14 @@ try {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch user data');
+            throw new Error('Failed to fetch user data with status code: ' + response.status);
         }
 
-        return await response.json();
+        const data = await response.json();
+        if (!Object.keys(data).length) {
+            throw new Error('Failed to fetch user data. No data returned.');
+        }
+        return data;
     }
 
     // Added: Function to fetch available timesheets
@@ -236,9 +240,14 @@ try {
             try {
                 // Ensure initialization is complete before handling messages
                 if (!USER_DATA || AVAILABLE_TIMESHEETS === null) {
-                    console.log('[HiBob Extension] Initializing on demand...');
-                    await initialize();
-                    console.log('[HiBob Extension] On-demand initialization complete.');
+                    try {
+                        console.log('[HiBob Extension] Initializing on demand...');
+                        await initialize();
+                        console.log('[HiBob Extension] On-demand initialization complete.');
+                    } catch (error) {
+                        console.error('[HiBob Extension] Error initializing on demand:', error);
+                        sendResponse({ error: error.message });
+                    }
                 }
 
                 switch (request.action) {
