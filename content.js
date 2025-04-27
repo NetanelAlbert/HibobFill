@@ -87,14 +87,18 @@ try {
 
     // Helper function to format date for the API
     function formatDateForApi(dateStr) {
-        const [_, day, month, year] = dateStr.match(/\w+,\s+(\d+)\/(\w+)\/(\d+)/);
+        const [_, day, monthRaw, year] = dateStr.match(/\w+,\s+(\d+)\/(\w+)\/(\d+)/);
         const months = {
             'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
             'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
             'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
         };
-        return `${year}-${months[month]}-${day.padStart(2, '0')}`;
-    }
+        
+        // If monthRaw is already numeric (like "04"), keep it. Otherwise, translate it.
+        const month = /^\d+$/.test(monthRaw) ? monthRaw.padStart(2, '0') : months[monthRaw];
+
+        return `${year}-${month}-${day.padStart(2, '0')}`;
+    }   
 
     // Helper function to add random minutes to time
     function addRandomMinutes(time, maxOffset, allowNegative = false) {
