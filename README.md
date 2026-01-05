@@ -6,6 +6,18 @@ This Chrome extension helps you manage your attendance entries in HiBob more eff
 
 > **Important Disclaimer:** This is an unofficial third-party tool and is NOT affiliated with, endorsed by, or connected to HiBob in any way. This extension is created by independent developers who are not associated with HiBob.
 
+## Table of Contents
+
+- [Features](#features)
+- [Privacy Information](#privacy-information)
+- [Installation](#installation)
+  - [From Chrome Web Store](#from-chrome-web-store)
+  - [From Code](#from-code)
+- [Usage](#usage)
+- [Development](#development)
+- [Legal](#legal)
+- [Icons](#icons)
+
 ## Features
 
 - **View Missing Days**: Easily identify days with missing attendance entries.
@@ -25,6 +37,12 @@ This extension:
 See the full [Privacy Policy](privacy.html) for more details.
 
 ## Installation
+
+### From Chrome Web Store
+
+https://chromewebstore.google.com/detail/nllhhppjjlecihljiolmniddpobjmbji
+
+### From Code
 
 1. **Download or Clone**: Get this repository on your local machine.
 2. **Open Chrome Extensions**: Go to `chrome://extensions/` in your Chrome browser.
@@ -57,3 +75,4 @@ The extension consists of:
 ## Icons
 
 Enjoy seamless attendance management with HiBob Attendance Filler!
+
